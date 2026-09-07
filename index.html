@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#101411" />
+  <title>FICSIT Component Calculator</title>
+  <style>
+    :root{--bg:#0d100e;--panel:#151a16;--panel2:#1b211c;--line:#303930;--text:#eee9dc;--muted:#a7aa9f;--accent:#f28a2e;--accent2:#ffad5c;--danger:#e96b63;--good:#89c98a;--mono:"JetBrains Mono",Consolas,monospace;--sans:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#20291f 0,#0d100e 45%);color:var(--text);font-family:var(--sans);min-height:100vh}button,input,select{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 20px 60px}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:24px}.eyebrow{font:12px var(--mono);letter-spacing:.14em;color:var(--accent);text-transform:uppercase}.title{font-size:clamp(30px,5vw,54px);line-height:1;margin:7px 0 8px;font-weight:800;letter-spacing:-.04em}.subtitle{color:var(--muted);max-width:720px}.status{font:12px var(--mono);color:var(--muted);white-space:nowrap}.status b{color:var(--good)}.controls{display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr) 130px auto;gap:10px;background:rgba(21,26,22,.92);border:1px solid var(--line);padding:14px;margin-bottom:18px}.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px}.field input,.field select{width:100%;height:46px;background:#0d110e;border:1px solid #3a433b;color:var(--text);padding:0 12px;outline:none}.field input:focus,.field select:focus{border-color:var(--accent)}.field select option.alt{font-weight:700}.recipe-badge{display:inline-block;margin-left:7px;padding:2px 6px;border:1px solid var(--accent);color:var(--accent2);font:10px var(--mono);letter-spacing:.04em;text-transform:uppercase}.recipe-select{margin:12px 16px 0}.recipe-select select{width:100%;background:#0d110e;border:1px solid #3a433b;color:var(--text);padding:9px}.actions{display:flex;align-items:end;gap:8px}.btn{height:46px;border:1px solid var(--accent);background:var(--accent);color:#17110b;font-weight:800;padding:0 18px;cursor:pointer}.btn.secondary{background:transparent;color:var(--text);border-color:var(--line)}.btn:hover{filter:brightness(1.08)}.options{display:flex;gap:18px;align-items:center;padding:0 2px 16px;color:var(--muted);font-size:13px}.options label{display:flex;gap:7px;align-items:center;cursor:pointer}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.panel{background:rgba(21,26,22,.94);border:1px solid var(--line);min-width:0}.panel h2{font-size:14px;text-transform:uppercase;letter-spacing:.1em;margin:0;padding:14px 16px;border-bottom:1px solid var(--line)}.tree{padding:16px}.tree-root{border-left:3px solid var(--accent);padding-left:13px}.node{position:relative;margin:8px 0}.node-row{display:flex;justify-content:space-between;gap:15px;padding:9px 10px;background:#111611;border:1px solid #252c26}.node-row .name{font-weight:650}.node-row .qty{font-family:var(--mono);color:var(--accent2);white-space:nowrap}.children{margin-left:16px;padding-left:12px;border-left:1px dashed #3a433b}.leaf .node-row{background:#171c17}.leaf .name{color:#d6d8ce}.raw{padding:16px}.raw-list{display:grid;grid-template-columns:1fr auto;gap:1px 0}.raw-row{display:contents}.raw-row>div{padding:10px 12px;background:#111611;border-bottom:1px solid #252c26}.raw-row .qty{font-family:var(--mono);text-align:right;color:var(--accent2)}.recipe-note{padding:14px 16px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);line-height:1.5}.recipe-select{margin:12px 16px 0}.recipe-select select{width:100%;background:#0d110e;border:1px solid #3a433b;color:var(--text);padding:9px}.empty{padding:38px 18px;text-align:center;color:var(--muted)}.error{color:#ffb0aa;background:#2a1715;border:1px solid #5b2b27;padding:12px;margin-bottom:18px;font-size:13px}.hint{font-size:12px;color:var(--muted);margin-top:8px}.footer{margin-top:18px;color:#777d74;font-size:11px;line-height:1.5}.footer a{color:#9fa99d}.summary-bar{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}.stat{padding:13px 16px}.stat+.stat{border-left:1px solid var(--line)}.stat small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:10px}.stat strong{display:block;font:18px var(--mono);margin-top:5px}.hidden{display:none}@media(max-width:800px){.top{display:block}.status{margin-top:10px}.controls{grid-template-columns:1fr 120px}.actions{grid-column:1/-1}.grid{grid-template-columns:1fr}.options{flex-wrap:wrap}.summary-bar{grid-template-columns:1fr}.stat+.stat{border-left:0;border-top:1px solid var(--line)}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <div class="eyebrow">FICSIT / Production Math</div>
+      <div class="title">Component Calculator</div>
+      <div class="subtitle">Tell it what you want to make. It recursively works backward through the recipes and tells you exactly how many components you need.</div>
+    </div>
+    <div class="status" id="status">Loading game data…</div>
+  </header>
+
+  <div id="error" class="error hidden"></div>
+
+  <section class="controls">
+    <div class="field"><label for="item">Item</label><input id="item" list="items" placeholder="Search an item…" autocomplete="off"><datalist id="items"></datalist></div>
+    <div class="field"><label for="amount">Amount</label><input id="amount" type="number" min="1" step="1" value="10"></div>
+    <div class="actions"><button class="btn" id="calculate">Calculate</button><button class="btn secondary" id="reset">Reset</button></div>
+  </section>
+  <div class="options">
+    <label><input type="checkbox" id="roundCrafts" checked> Round to whole craft cycles</label>
+    <label><input type="checkbox" id="showAlternates"> Allow alternate recipes</label>
+  </div>
+
+  <div id="results" class="grid">
+    <section class="panel"><h2>Production Tree</h2><div id="tree" class="empty">Choose an item and calculate.</div></section>
+    <section class="panel"><h2>Raw Materials</h2><div id="raw" class="empty">Your base resources will appear here.</div><div id="summary" class="summary-bar hidden"></div></section>
+  </div>
+
+  <div class="footer">Game data is loaded from a community-maintained Satisfactory dataset derived from the game's recipe data. This is an unofficial fan tool and is not affiliated with Coffee Stain Studios.</div>
+</div>
+<script>
+const DATA_URL = 'https://raw.githubusercontent.com/KirkMcDonald/satisfactory-calculator/master/data/data.json';
+const FALLBACK = {
+  items:[
+    ['Iron Ore','iron-ore'],['Iron Ingot','iron-ingot'],['Iron Plate','iron-plate'],['Iron Rod','iron-rod'],['Screw','screw'],['Reinforced Iron Plate','reinforced-iron-plate'],['Modular Frame','modular-frame'],['Steel Ingot','steel-ingot'],['Steel Beam','steel-beam'],['Steel Pipe','steel-pipe'],['Concrete','concrete'],['Encased Industrial Beam','encased-industrial-beam'],['Heavy Modular Frame','heavy-modular-frame']
+  ].map(([name,key_name])=>({name,key_name})),
+  recipes:[
+    {name:'Iron Ingot',key_name:'iron-ingot',ingredients:[['iron-ore',1]],products:[['iron-ingot',1]]},
+    {name:'Iron Plate',key_name:'iron-plate',ingredients:[['iron-ingot',3]],products:[['iron-plate',2]]},
+    {name:'Iron Rod',key_name:'iron-rod',ingredients:[['iron-ingot',1]],products:[['iron-rod',1]]},
+    {name:'Screw',key_name:'screw',ingredients:[['iron-rod',1]],products:[['screw',4]]},
+    {name:'Reinforced Iron Plate',key_name:'reinforced-iron-plate',ingredients:[['iron-plate',6],['screw',12]],products:[['reinforced-iron-plate',1]]},
+    {name:'Modular Frame',key_name:'modular-frame',ingredients:[['reinforced-iron-plate',3],['iron-rod',12]],products:[['modular-frame',2]]},
+    {name:'Steel Ingot',key_name:'steel-ingot',ingredients:[['iron-ore',3],['coal',3]],products:[['steel-ingot',3]]},
+    {name:'Steel Beam',key_name:'steel-beam',ingredients:[['steel-ingot',4]],products:[['steel-beam',1]]},
+    {name:'Steel Pipe',key_name:'steel-pipe',ingredients:[['steel-ingot',3]],products:[['steel-pipe',2]]},
+    {name:'Concrete',key_name:'concrete',ingredients:[['limestone',3]],products:[['concrete',1]]},
+    {name:'Encased Industrial Beam',key_name:'encased-industrial-beam',ingredients:[['steel-beam',3],['concrete',6]],products:[['encased-industrial-beam',1]]},
+    {name:'Heavy Modular Frame',key_name:'heavy-modular-frame',ingredients:[['modular-frame',5],['steel-pipe',20],['encased-industrial-beam',5],['screw',120]],products:[['heavy-modular-frame',1]]}
+  ]
+};
+let DATA=null, itemsByKey=new Map(), itemsByName=new Map(), recipesByOutput=new Map(), selectedRecipes=new Map(), lastCalculation=null;
+const $=id=>document.getElementById(id);
+const fmt=n=>Number.isInteger(n)?n.toLocaleString():n.toLocaleString(undefined,{maximumFractionDigits:3});
+const prettyKey=k=>k.replace(/^(alt-)/,'').replace(/-/g,' ');
+function isAlt(r){return /^alternate:/i.test(r.name||'') || /^alt-/i.test(r.key_name||'');}
+function normalize(data){
+  itemsByKey.clear(); itemsByName.clear(); recipesByOutput.clear();
+  (data.items||[]).forEach(i=>{itemsByKey.set(i.key_name,i);itemsByName.set(i.name.toLowerCase(),i)});
+  (data.recipes||[]).forEach(r=>{for(const [out] of (r.products||[])){if(!recipesByOutput.has(out))recipesByOutput.set(out,[]);recipesByOutput.get(out).push(r)}});
+  for(const [key,list] of recipesByOutput){list.sort((a,b)=>Number(isAlt(a))-Number(isAlt(b)))}
+  const dl=$('items'); dl.innerHTML=''; [...itemsByKey.values()].sort((a,b)=>a.name.localeCompare(b.name)).forEach(i=>{const o=document.createElement('option');o.value=i.name;dl.appendChild(o)});
+}
+function findItem(value){const exact=itemsByName.get(value.trim().toLowerCase()); if(exact)return exact; const q=value.trim().toLowerCase(); return [...itemsByKey.values()].find(i=>i.name.toLowerCase().includes(q));}
+function sortedRecipes(key){
+  return (recipesByOutput.get(key)||[]).slice().sort((a,b)=>{
+    const aa=isAlt(a), bb=isAlt(b);
+    if(aa!==bb)return Number(aa)-Number(bb);
+    return (a.name||'').replace(/^alternate:\s*/i,'').localeCompare((b.name||'').replace(/^alternate:\s*/i,''));
+  });
+}
+function getRecipe(key){const list=sortedRecipes(key); if(!list.length)return null; const chosen=selectedRecipes.get(key); if(chosen)return list.find(r=>r.key_name===chosen)||list[0]; return list[0];}
+function productAmount(recipe,key){const p=(recipe.products||[]).find(x=>x[0]===key);return p?p[1]:0;}
+function recipeChoices(key){return sortedRecipes(key);}
+function calculateNode(key, requested, path=new Set()){
+  if(path.has(key)) return {key,requested,produced:requested,crafts:0,recipe:null,inputs:[],cycle:true};
+  const recipe=getRecipe(key);
+  if(!recipe) return {key,requested,produced:requested,crafts:0,recipe:null,inputs:[]};
+  const perCraft=productAmount(recipe,key); if(!perCraft)return {key,requested,produced:requested,crafts:0,recipe:null,inputs:[]};
+  const round=$('roundCrafts').checked; const crafts=round?Math.ceil(requested/perCraft):requested/perCraft; const produced=crafts*perCraft;
+  const inputs=(recipe.ingredients||[]).map(([child,qty])=>({qty:qty*crafts,node:calculateNode(child,qty*crafts,new Set([...path,key]))}));
+  return {key,requested,produced,crafts,recipe,inputs};
+}
+function collectRaw(node, map=new Map(), seen=new Set()){
+  if(!node.recipe){map.set(node.key,(map.get(node.key)||0)+node.produced);return map}
+  for(const x of node.inputs)collectRaw(x.node,map,seen); return map;
+}
+function aggregate(node,map=new Map()){
+  map.set(node.key,(map.get(node.key)||0)+node.produced);
+  for(const x of node.inputs)aggregate(x.node,map);return map;
+}
+function renderNode(node,depth=0){
+  const item=itemsByKey.get(node.key)||{name:prettyKey(node.key)};
+  const div=document.createElement('div');div.className='node'+(!node.recipe?' leaf':'');
+  const row=document.createElement('div');row.className='node-row';
+  const name=document.createElement('span');name.className='name';name.textContent=item.name;
+  const qty=document.createElement('span');qty.className='qty';qty.textContent=fmt(node.produced);
+  row.append(name,qty);div.appendChild(row);
+  if(node.recipe){
+    const children=document.createElement('div');children.className='children';
+    for(const x of node.inputs)children.appendChild(renderNode(x.node,depth+1));div.appendChild(children);
+  }
+  return div;
+}
+function updateRecipePicker(rootKey){
+  const select=$('recipe');
+  const choices=recipeChoices(rootKey);
+  select.innerHTML='';
+  if(!choices.length){
+    select.innerHTML='<option value="">No recipe available</option>';
+    select.disabled=true;
+    return;
+  }
+  select.disabled=false;
+  const selected=getRecipe(rootKey);
+  choices.forEach((r,index)=>{
+    const o=document.createElement('option');
+    o.value=r.key_name;
+    o.textContent=(r.name||'Recipe')+(isAlt(r)?'  —  ALTERNATE':'  —  BASE');
+    if(isAlt(r))o.className='alt';
+    if(selected && selected.key_name===r.key_name)o.selected=true;
+    select.appendChild(o);
+  });
+}
+function run(){
+  if(!DATA)return; const item=findItem($('item').value); const amount=Math.max(1,Number($('amount').value)||1); if(!item){$('error').textContent='I could not find that item. Start typing and choose an item from the suggestions.';$('error').classList.remove('hidden');return}
+  $('error').classList.add('hidden');$('item').value=item.name; updateRecipePicker(item.key_name); const root=calculateNode(item.key_name,amount); lastCalculation=root;
+  $('tree').className='tree';$('tree').innerHTML='';const rootBox=document.createElement('div');rootBox.className='tree-root';rootBox.appendChild(renderNode(root));$('tree').appendChild(rootBox);
+  const raw=collectRaw(root);$('raw').className='raw';$('raw').innerHTML='';const list=document.createElement('div');list.className='raw-list';[...raw.entries()].sort((a,b)=>(itemsByKey.get(a[0])?.name||a[0]).localeCompare(itemsByKey.get(b[0])?.name||b[0])).forEach(([key,qty])=>{const row=document.createElement('div');row.className='raw-row';const n=document.createElement('div');n.textContent=itemsByKey.get(key)?.name||prettyKey(key);const q=document.createElement('div');q.className='qty';q.textContent=fmt(qty);row.append(n,q);list.appendChild(row)});$('raw').appendChild(list);
+  const all=aggregate(root);let components=0;for(const [key] of all)if(key!==item.key_name)components++;$('summary').classList.remove('hidden');$('summary').innerHTML='';[['TARGET',fmt(root.produced)],['RAW TYPES',fmt(raw.size)],['COMPONENT TYPES',fmt(components)]].forEach(([a,b],idx)=>{const s=document.createElement('div');s.className='stat';s.innerHTML='<small>'+a+'</small><strong>'+b+'</strong>';if(idx){}$('summary').appendChild(s)});
+}
+async function load(){
+  try{const res=await fetch(DATA_URL,{cache:'no-store'});if(!res.ok)throw new Error('HTTP '+res.status);DATA=await res.json();normalize(DATA);$('status').innerHTML='<b>LIVE DATA</b> · '+(DATA.items?.length||0)+' items';}
+  catch(e){DATA=FALLBACK;normalize(DATA);$('status').innerHTML='<b>FALLBACK</b> · bundled starter data';$('error').textContent='The live community dataset could not be loaded, so the calculator is using a small built-in fallback dataset. The full GitHub Pages version will normally use the live dataset.';$('error').classList.remove('hidden');}
+  $('item').value='Heavy Modular Frame';run();
+}
+$('calculate').onclick=run;$('recipe').addEventListener('change',()=>{const item=findItem($('item').value);if(item){selectedRecipes.set(item.key_name,$('recipe').value);run();}});$('item').addEventListener('input',()=>{const item=findItem($('item').value);if(item)updateRecipePicker(item.key_name);});$('reset').onclick=()=>{$('item').value='';$('amount').value=10;selectedRecipes.clear();$('recipe').innerHTML='<option value="">Select an item first…</option>';$('recipe').disabled=true;$('tree').className='empty';$('tree').textContent='Choose an item and calculate.';$('raw').className='empty';$('raw').textContent='Your base resources will appear here.';$('summary').classList.add('hidden')};$('item').addEventListener('keydown',e=>{if(e.key==='Enter')run()});$('amount').addEventListener('keydown',e=>{if(e.key==='Enter')run()});$('showAlternates').addEventListener('change',()=>{if(lastCalculation)run()});load();
+</script>
+</body>
+</html>
