@@ -33,3 +33,7 @@ The site loads recipe data directly from the public `KirkMcDonald/satisfactory-c
 - Shareable URLs.
 - A "what can I make with these resources?" mode.
 - Pin a specific Satisfactory game-data version instead of tracking the community dataset's moving `master` branch.
+
+
+### Somersloop 2× mode
+The calculator includes an optional **Use Somersloops (2× production)** setting. When enabled, eligible production recipes are calculated at full 2× production amplification: the recipe output is doubled while its input requirements per cycle remain unchanged. Non-amplifiable buildings such as miners, extractors, and packagers are not modified. This matches Satisfactory's full Somersloop production amplification behavior.
